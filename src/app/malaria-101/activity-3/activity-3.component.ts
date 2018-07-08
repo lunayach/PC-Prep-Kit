@@ -8,6 +8,7 @@ import { LanguageService } from '../../services/language.service';
 import { BadgeService } from '../../services/BadgeService/badge.service';
 import swal from 'sweetalert2';
 import { PerformanceDisplayService } from '../../services/performance-display.service';
+import { LeaderBoardService } from '../../services/leaderBoard.service';
 
 @Component({
     selector: 'app-oddoneout',
@@ -23,8 +24,10 @@ export class OddOneOutComponent implements OnInit {
     private _subscription;
     private _data;
     private _status: object = {stage: 2, activity: 3};
+    private pointsPerCorrectAnswer = 10;
 
-    public activityComplete;
+
+  public activityComplete;
     public questionText;
     public score;
     public opt = [];
@@ -34,7 +37,7 @@ export class OddOneOutComponent implements OnInit {
     public solutions = '';
 
     constructor(private _langService: LanguageService, private _dashboardService: DashboardService, private _sharedData: SharedDataService,  vcr: ViewContainerRef,
-                private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService) {
+                private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService, private _leaderBoardService: LeaderBoardService) {
 
     }
 
@@ -124,6 +127,16 @@ export class OddOneOutComponent implements OnInit {
         this._questionNumber++;
         if (this._questionNumber === 5) {
             this.activityComplete = true;
+            this._dashboardService.getActivityScore({activity: 'oddOneOut'}).subscribe( res => {
+              const points = this.score * this.pointsPerCorrectAnswer;
+              if ((res.score < points)) {
+                // ensuring best possible score
+                const prevScore = res.score;
+                this._dashboardService.updateActivityScore({activity: 'oddOneOut', score: points}).subscribe(() => {
+                  this._leaderBoardService.updateLeaderBoard({activity: 'oddOneOut', score: points, prevScore: prevScore})
+                });
+              }
+            });
             swal({
               title: this.language.alerts.title,
               html: this.solutions,

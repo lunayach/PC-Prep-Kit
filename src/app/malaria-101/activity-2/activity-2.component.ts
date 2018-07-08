@@ -4,7 +4,7 @@ import { LanguageService } from '../../services/language.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { SharedDataService } from '../../services/shared.data.service';
 import { PerformanceDisplayService } from '../../services/performance-display.service';
-
+import { LeaderBoardService } from '../../services/leaderBoard.service';
 
 @Component({
     selector: 'app-dragdrop',
@@ -16,6 +16,8 @@ export class DragdropComponent implements OnInit {
     public dropCheckDo: String;
     public dropCheckDont: String;
     language: any;
+    private score = 0;
+    private pointsPerCorrectAnswer = 10;
     private _status: object = {stage: 2, activity: 2};
 
     public activityComplete = false;
@@ -69,24 +71,14 @@ export class DragdropComponent implements OnInit {
     addTobox($event: any, $box: String) {
         this.reset();
         if ($event.dragData.value === $box) {
+          this.score += this.pointsPerCorrectAnswer;
+        }
             $box === 'do' ? this.do.push($event.dragData) : this.dont.push($event.dragData);
             this.dosAndDonts.splice(this.dosAndDonts.indexOf($event.dragData), 1);
             if (!this.dosAndDonts.length) {
                 this.onComplete();
             }
-        }
      }
-
-    /**
-     * Checks if the content is valid to add border to the drop box
-     * @param  {any}    $event Event Object when any Statement object is dragged and dropped
-     * @param  {String} $box   The box on which the content is dropped
-     */
-    checkDrop($event: any, $box: String) {
-        if ($event.dragData.value !== $box) {
-            $box === 'do' ?  this.dropCheckDo = 'wrong-drop' : this.dropCheckDont = 'wrong-drop';
-        }
-    }
 
     reset() {
         this.dropCheckDo = '';
@@ -103,6 +95,15 @@ export class DragdropComponent implements OnInit {
      * Display the completion Message and Activate Infokit for the activity.
      */
     onComplete() {
+      this._dashboardService.getActivityScore({activity: 'dragAndDrop'}).subscribe( res => {
+        if ((res.score < this.score)) {
+          // ensuring best possible score
+          const prevScore = res.score;
+          this._dashboardService.updateActivityScore({activity: 'dragAndDrop', score: this.score}).subscribe(() => {
+            this._leaderBoardService.updateLeaderBoard({activity: 'dragAndDrop', score: this.score, prevScore: prevScore})
+          });
+        }
+      });
         this.activityComplete = true;
         this._sharedData.customSuccessAlert(this.alerts.activitySuccessMsg, this.alerts.activitySuccessTitle);
         this._dashboardService.updateProgressStatus(this._status).subscribe(response => {});
@@ -113,7 +114,7 @@ export class DragdropComponent implements OnInit {
     }
 
     constructor(private _dashboardService: DashboardService, private _sharedData: SharedDataService, private _infokitService: InfokitService,  vcr: ViewContainerRef, private _langService: LanguageService,
-                private _performanceService: PerformanceDisplayService
+                private _performanceService: PerformanceDisplayService, private _leaderBoardService: LeaderBoardService
     ) {
         this._dashboardService.getProgressStatus().subscribe(response => {
             this.completed = this._sharedData.checkProgress(2, 2, response);

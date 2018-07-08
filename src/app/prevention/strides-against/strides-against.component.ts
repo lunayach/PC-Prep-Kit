@@ -14,6 +14,7 @@ import { InfokitService } from '../../services/infokit.service';
 import { BadgeService } from '../../services/BadgeService/badge.service';
 import { CertificateService } from '../../certificate/certificate.component';
 import { PerformanceDisplayService } from '../../services/performance-display.service';
+import { LeaderBoardService } from '../../services/leaderBoard.service';
 
 export class PaperConfig {
   imageIndex: number;
@@ -63,7 +64,8 @@ export class StridesAgainstComponent implements OnInit {
 
   constructor(public languageService: LanguageService, public dialog: MatDialog, public sharedDataService: SharedDataService,
               public router: Router, public dashboardService: DashboardService, private infokitService: InfokitService,
-              private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService, private _certificateService: CertificateService) {
+              private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService, private _certificateService: CertificateService,
+              private _leaderBoardService: LeaderBoardService) {
   }
 
   /**
@@ -174,6 +176,7 @@ export class StridesAgainstComponent implements OnInit {
             this._performanceService.openDialog(currStage);
             this._badgeService.updateBadgeNumber(badgeNumber).subscribe(res => res);
             this._certificateService.openCertificate();
+            this._leaderBoardService.updateLeaderBoard({activity: 'strideAgainst', level: 'level1'});
           }
           this.infokitService.activateinfokit('stride_Against').subscribe( () => {});
         }

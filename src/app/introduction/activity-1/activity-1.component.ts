@@ -5,6 +5,7 @@ import { Component, OnInit } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { SharedDataService } from '../../services/shared.data.service';
 import { LanguageService } from '../../services/language.service';
+import { LeaderBoardService } from '../../services/leaderBoard.service';
 
 @Component({
     selector: 'app-highlight',
@@ -24,7 +25,7 @@ export class HighlightActivityComponent implements OnInit {
     public alerts: any;
     public completed = false;
   constructor(private _langService: LanguageService, private _dashboardService: DashboardService,
-              private _sharedData: SharedDataService, private _performanceService: PerformanceDisplayService) {
+              private _sharedData: SharedDataService, private _performanceService: PerformanceDisplayService, private _leaderBoardService: LeaderBoardService) {
 
   }
 
@@ -69,8 +70,9 @@ export class HighlightActivityComponent implements OnInit {
                 });
                 this._sharedData.customSuccessAlert(this.alerts.activitySuccessMsg, this.alerts.activitySuccessTitle);
                 this.activityComplete = true;
-                if (!this.completed) { const currStage = 1;
-                  this._performanceService.openDialog(currStage); }
+          if (!this.completed) { const currStage = 1;
+                  this._performanceService.openDialog(currStage);
+                  this._leaderBoardService.updateLeaderBoard({activity: 'highlightDefinition', level: 'level1'})}
             }
         }
     }

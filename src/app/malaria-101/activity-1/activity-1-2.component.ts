@@ -3,6 +3,7 @@ import { DashboardService } from '../../services/dashboard.service';
 import { SharedDataService } from '../../services/shared.data.service';
 import { LanguageService } from '../../services/language.service';
 import { PerformanceDisplayService } from '../../services/performance-display.service';
+import { LeaderBoardService } from '../../services/leaderBoard.service';
 
 @Component({
     selector: 'app-life-cycle',
@@ -28,7 +29,8 @@ export class MalariaLifeCycleComponent implements OnInit {
     public labelsArr;
 
     constructor(private _langService: LanguageService, private _dashboardService: DashboardService, private _sharedData: SharedDataService,  vcr: ViewContainerRef,
-                private _performanceService: PerformanceDisplayService) {
+                private _performanceService: PerformanceDisplayService, private _leaderBoardService: LeaderBoardService
+    ) {
         this._dashboardService.getProgressStatus().subscribe(response => {
             this.completed = this._sharedData.checkProgress(2, 1, response);
         });
@@ -110,8 +112,11 @@ export class MalariaLifeCycleComponent implements OnInit {
 
         if (!isWrongPos && arrLength === 6) {
             this.activityComplete = true;
-          if (!this.completed) {const currStage = 3;
-            this._performanceService.openDialog(currStage); }
+          if (!this.completed) {
+            const currStage = 3;
+            this._performanceService.openDialog(currStage);
+            this._leaderBoardService.updateLeaderBoard({activity: 'lifeCycle', level: 'level1'})
+          }
           this._sharedData.customSuccessAlert(this.alerts.activitySuccessMsg, this.alerts.activitySuccessTitle);
             this._dashboardService.updateProgressStatus(this._status).subscribe(response => {});
         } else if (arrLength === 6) {

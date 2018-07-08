@@ -1,0 +1,22 @@
+<div id="body">
+  <div id="close" (click)="close()">&times;</div>
+  <img [src]="image">
+  <div id="table">{{language?.badge}}{{badgeName}}</div>
+  <br>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>{{language?.rank}}</th>
+      <th>{{language?.name}}</th>
+      <th>{{language?.points}}</th>
+    </tr>
+    </thead>
+    <tbody *ngFor="let user of data; index as i">
+    <tr>
+      <td>{{i + 1}}</td>
+      <td>{{user.name}}</td>
+      <td>{{user.score}}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>

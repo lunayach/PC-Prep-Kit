@@ -8,6 +8,7 @@ import { SharedDataService } from '../../services/shared.data.service';
 import { LanguageService } from '../../services/language.service';
 import { BadgeService } from '../../services/BadgeService/badge.service';
 import { PerformanceDisplayService } from '../../services/performance-display.service';
+import { LeaderBoardService } from '../../services/leaderBoard.service';
 
 @Component({
     selector: 'app-activity-2',
@@ -55,7 +56,7 @@ export class MemoryGameComponent implements OnInit {
             ];
 
     constructor(private _langService: LanguageService, private _dashboardService: DashboardService, private _sharedData: SharedDataService,
-                private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService) {
+                private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService, private _leaderBoardService: LeaderBoardService) {
             this._sharedData.position.subscribe(
             value => {
                 this.position = value;
@@ -171,6 +172,7 @@ export class MemoryGameComponent implements OnInit {
                   const currStage = 7;
                   this._badgeService.updateBadgeNumber(badgeNumber).subscribe(res => res);
                   this._performanceService.openDialog(currStage); }
+                  this._leaderBoardService.updateLeaderBoard({activity: 'memoryGame', level: 'level1'});
             }
             return;
         }

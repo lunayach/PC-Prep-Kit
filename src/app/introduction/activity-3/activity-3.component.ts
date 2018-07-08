@@ -8,6 +8,7 @@ import { SharedDataService } from '../../services/shared.data.service';
 import { LanguageService } from '../../services/language.service';
 import { BadgeService } from '../../services/BadgeService/badge.service';
 import { PerformanceDisplayService } from '../../services/performance-display.service';
+import { LeaderBoardService } from '../../services/leaderBoard.service';
 
 @Component({
     selector: 'app-activity3',
@@ -59,7 +60,8 @@ export class PicturePuzzleComponent implements OnInit {
     public userData: any;
 
     constructor(private _langService: LanguageService, private _http: HttpClient, private _dashboardService: DashboardService, vcr: ViewContainerRef, private _renderer: Renderer2,
-                private _sharedData: SharedDataService, private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService) {
+                private _sharedData: SharedDataService, private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService, private _leaderBoardService: LeaderBoardService
+    ) {
     }
 
     changeWebcamState(state, btnText) {
@@ -368,7 +370,8 @@ export class PicturePuzzleComponent implements OnInit {
           const currStage = 2;
           this._performanceService.openDialog(currStage);
           this._badgeService.updateBadgeNumber(badgeNumber).subscribe(res => res);
-        }
+          this._leaderBoardService.updateLeaderBoard({activity: 'picturePuzzle', level: 'level1'})
+    }
 
     }
 }

@@ -6,6 +6,7 @@ import { SharedDataService } from '../../services/shared.data.service';
 import { LanguageService } from '../../services/language.service';
 import { InfokitService } from '../../services/infokit.service';
 import { PerformanceDisplayService } from '../../services/performance-display.service';
+import { LeaderBoardService } from '../../services/leaderBoard.service';
 
 @Component({
     selector: 'app-matchmeds',
@@ -66,7 +67,7 @@ export class MatchmedsComponent implements OnInit {
     givenAns = [0, 0, 0];
 
     constructor(private _langService: LanguageService,  private _dashboardService: DashboardService, private _sharedData: SharedDataService, vcr: ViewContainerRef, private _infokitService: InfokitService,
-                private _performanceService: PerformanceDisplayService) {
+                private _performanceService: PerformanceDisplayService, private _leaderBoardService: LeaderBoardService) {
 
     }
 
@@ -296,9 +297,10 @@ export class MatchmedsComponent implements OnInit {
                             this.activityComplete = true;
                             if (!this.completed) { const currStage = 6;
                               this._performanceService.openDialog(currStage); }
-                            this._dashboardService.updateProgressStatus(this._status).subscribe(response => {});
-                            this._infokitService.activateinfokit('match_meds').subscribe(res => {});
-                        }
+                              this._dashboardService.updateProgressStatus(this._status).subscribe(response => {});
+                              this._infokitService.activateinfokit('match_meds').subscribe(res => {});
+                              this._leaderBoardService.updateLeaderBoard({activity: 'matchMeds', level: 'level1'});
+                    }
                     } else {
                         this.redrawCanvas();
                         this._sharedData.customErrorAlert(this.alerts.activityFailMsg, this.alerts.activityFailTitle);

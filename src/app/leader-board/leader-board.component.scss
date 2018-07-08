@@ -1,0 +1,21 @@
+@import "../styles/main";
+
+#body{
+  font-size: $font-size-med;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+th{
+  text-align: center;
+}
+
+#close {
+  text-align: right;
+  font-size: $font-size-large;
+  cursor: pointer;
+}
+
+#table {
+  text-align: center;
+}

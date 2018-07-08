@@ -16,7 +16,7 @@ describe('Testing APIs', function() {
             .send(testCred)
             .expect(200)
             .end(function(err, res) {
-                res.body.error.should.equal('PCE008 : Invalid email or password');
+                res.body.error.should.equal('Invalid email or password');
                 done();
             });
     });
@@ -26,7 +26,7 @@ describe('Testing APIs', function() {
             .send(testCred)
             .expect(200)
             .end(function(err, res) {
-                res.body.info.should.equal('PCE011 : This account does not exist or you cannot change the password for this account');
+                res.body.info.should.equal('This account does not exist or you cannot change the password for this account');
                 done();
             });
     });
@@ -42,7 +42,7 @@ describe('Testing APIs', function() {
                 .expect(200)
                 .end(function(err, res) {
                     res.body.should.be.okay;
-                    res.body.should.equal('PCS005 : Verification mail sent, please check your mail');
+                    res.body.should.equal('Verification mail sent, please check your mail');
                     done();
                 })
         });
@@ -88,7 +88,7 @@ describe('Testing APIs', function() {
                 .send(testCred)
                 .expect(200)
                 .end(function(err, res) {
-                    res.body.success.should.equal(`PCS002 : An e-mail has been sent to ${testCred.email} with further instructions`);
+                    res.body.success.should.equal(`An e-mail has been sent to ${testCred.email} with further instructions`);
                     done();
                 });
         });
@@ -171,7 +171,7 @@ describe('Testing APIs', function() {
                     .send(updatedProfile)
                     .expect(200)
                     .end(function(err, res) {
-                        res.body.info.should.equal('PCS006 : User\'s profile was successfully updated');
+                        res.body.info.should.equal('User\'s profile was successfully updated');
                         done();
                     });
             });
@@ -214,7 +214,7 @@ describe('Testing APIs', function() {
                     .send(updatedStatus)
                     .expect(200)
                     .end(function(err, res) {
-                        res.body.info.should.equal('PCE027 : Illegal operation');
+                        res.body.info.should.equal('Illegal operation');
                         done();
                     });
             });
@@ -229,7 +229,7 @@ describe('Testing APIs', function() {
                     .send(updatedStatus)
                     .expect(200)
                     .end(function(err, res) {
-                        res.body.info.should.equal('PCS003 : Successfully updated user progress status');
+                        res.body.info.should.equal('Successfully updated user progress status');
                         done();
                     });
             });
@@ -243,7 +243,7 @@ describe('Testing APIs', function() {
                     .send()
                     .expect(200)
                     .end(function(err, res) {
-                        res.body.error.should.equal('PCE029 : No data recieved to update progress status');
+                        res.body.error.should.equal('No data recieved to update progress status');
                         done();
                     });
             });
@@ -258,7 +258,7 @@ describe('Testing APIs', function() {
                     .send(updatedStatus)
                     .expect(200)
                     .end(function(err, res) {
-                        res.body.info.should.equal('PCS003 : Successfully updated user progress status');
+                        res.body.info.should.equal('Successfully updated user progress status');
                         done();
                     });
             });
@@ -273,7 +273,7 @@ describe('Testing APIs', function() {
                     .send(newBadge)
                     .expect(200)
                     .end(function(err, res) {
-                        res.body.info.should.equal('PCS007 : User\'s current badge was successfully updated');
+                        res.body.info.should.equal('User\'s current badge was successfully updated');
                         done();
                     });
             });
@@ -287,6 +287,81 @@ describe('Testing APIs', function() {
                     .expect(200)
                     .end(function(err, res) {
                         res.body.badge.should.equal(10);
+                        done();
+                    });
+            });
+
+
+            it('Update User\'s total score', function(done) {
+                let newScore = {score: 100};
+                server
+                    .patch('/api/user/score/update')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('x-access-token', `'${token}'`)
+                    .send(newScore)
+                    .expect(200)
+                    .end(function(err, res) {
+                        res.body.info.should.equal('User\'s current total score was successfully updated');
+                        done();
+                    });
+            });
+
+            it('Get User\'s score', function(done) {
+                server
+                    .get('/api/user/score')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('x-access-token', `'${token}'`)
+                    .expect(200)
+                    .end(function(err, res) {
+                        res.body.score.should.equal(100);
+                        done();
+                    });
+            });
+
+            it('Update User\'s score in specific activity', function(done) {
+                let body = {activity: 'dragAndDrop', score: 150};
+                server
+                    .patch('/api/user/activity/score/update')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('x-access-token', `'${token}'`)
+                    .send(body)
+                    .expect(200)
+                    .end(function(err, res) {
+                        res.body.info.should.equal('User\'s current score in the specific activity was updated');
+                        done();
+                    });
+            });
+
+            it('Get User\'s score in specific activity', function(done) {
+                let body = {activity: 'dragAndDrop'};
+                server
+                    .post('/api/user/activity/score')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('x-access-token', `'${token}'`)
+                    .send(body)
+                    .expect(200)
+                    .end(function(err, res) {
+                        res.body.score.should.equal(150);
+                        done();
+                    });
+            });
+
+            it('Get the LeaderBoard array', function(done) {
+                let body = {badge: 10};
+                server
+                    .post('/api/leaderBoard')
+                    .set('Content-Type', 'application/json')
+                    .set('Accept', 'application/json')
+                    .set('x-access-token', `'${token}'`)
+                    .send(body)
+                    .expect(200)
+                    .end(function(err, res) {
+                        res.body[0].score.should.equal(100);
+                        res.body[0].name.should.equal('newFirstName newLastName');
                         done();
                     });
             });
@@ -313,7 +388,7 @@ describe('Testing APIs', function() {
                     .query({activate: 'malaria_def'})
                     .expect(200)
                     .end(function(err, res) {
-                        res.body.message.should.equal('PCS004 : Activity added to Infokit');
+                        res.body.message.should.equal('Activity added to Infokit');
                         done();
                     });
             });
