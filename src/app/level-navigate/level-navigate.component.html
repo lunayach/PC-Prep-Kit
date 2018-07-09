@@ -1,0 +1,8 @@
+<div id="level-navigate" *ngIf="levelsURL.length > 1">
+  <div *ngFor="let levelURL of levelsURL; index as i;">
+    <a [href]="levelURL" [ngClass]="{'active-level': (i+1) === userCurrentLevel }">
+      <button mat-stroked-button class="row"> Level{{i+1}}</button>
+    </a>
+    <br>
+  </div>
+</div>

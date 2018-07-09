@@ -9,6 +9,7 @@ import { LanguageService } from '../../services/language.service';
 import { BadgeService } from '../../services/BadgeService/badge.service';
 import { PerformanceDisplayService } from '../../services/performance-display.service';
 import { LeaderBoardService } from '../../services/leaderBoard.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-activity3',
@@ -20,7 +21,10 @@ export class PicturePuzzleComponent implements OnInit {
     // "#video" is the name of the template variable in the video element
     @ViewChild('video') video: any;
 
-    private PUZZLE_DIFFICULTY = 4;
+    private PUZZLE_DIFFICULTY : number;
+    private difficultyList = [2, 4, 6];
+    private levels = ['level1', 'level2', 'level3'];
+    private level: string;
     private PUZZLE_HOVER_TINT = '#009900';
 
     private _canvas;
@@ -58,9 +62,11 @@ export class PicturePuzzleComponent implements OnInit {
     public completed = false;
     public alerts: any;
     public userData: any;
+    public currStage = 2;
 
     constructor(private _langService: LanguageService, private _http: HttpClient, private _dashboardService: DashboardService, vcr: ViewContainerRef, private _renderer: Renderer2,
-                private _sharedData: SharedDataService, private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService, private _leaderBoardService: LeaderBoardService
+                private _sharedData: SharedDataService, private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService, private _leaderBoardService: LeaderBoardService,
+                private _route: ActivatedRoute
     ) {
     }
 
@@ -104,6 +110,10 @@ export class PicturePuzzleComponent implements OnInit {
         this._dashboardService.getProgressStatus().subscribe(response => {
             this.completed = this._sharedData.checkProgress(1, 3, response);
         });
+        this._route.params.subscribe( params => {
+          this.PUZZLE_DIFFICULTY = this.difficultyList[ params.level - 1];
+          this.level = this.levels[ params.level - 1 ];
+        })
     }
 
     upload() {
@@ -367,10 +377,9 @@ export class PicturePuzzleComponent implements OnInit {
         this.activityComplete = true;
         if (!this.completed) {
           const badgeNumber = 1;
-          const currStage = 2;
-          this._performanceService.openDialog(currStage);
+          this._performanceService.openDialog(this.currStage);
           this._badgeService.updateBadgeNumber(badgeNumber).subscribe(res => res);
-          this._leaderBoardService.updateLeaderBoard({activity: 'picturePuzzle', level: 'level1'})
+          this._leaderBoardService.updateLeaderBoard({activity: 'picturePuzzle', level: this.level})
     }
 
     }

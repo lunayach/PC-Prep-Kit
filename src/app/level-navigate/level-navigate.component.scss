@@ -1,0 +1,17 @@
+@import "../styles/main";
+
+#level-navigate {
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  right: 0;
+}
+
+button {
+  border-radius: $border-radius;
+  font-size: $font-size-small;
+}
+
+.active-level {
+  color: $black;
+}

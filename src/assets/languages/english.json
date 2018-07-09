@@ -199,7 +199,8 @@
           "Dashboard": "Dashboard",
           "Toolkit": "Infokit"
         },
-        "message": "This activity has been added to the toolkit. You may access it from there in future."
+        "message": "This activity has been added to the toolkit. You may access it from there in future.",
+        "levelsMessage": "You can also play higher levels"
       },
       "leaderBoard": {
         "headings": {

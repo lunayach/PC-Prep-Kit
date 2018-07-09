@@ -81,8 +81,6 @@ module.exports = function(passport, models) {
                         user_id: user.id
                     }, defaults: {
                         user_id: user.id,
-                        dragAndDrop: 0,
-                        oddOneOut: 0
                     }})
                         .spread(() => {
                             const response = {email: user.email, name: user.name};

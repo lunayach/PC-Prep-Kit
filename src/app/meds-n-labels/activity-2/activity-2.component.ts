@@ -9,6 +9,8 @@ import { LanguageService } from '../../services/language.service';
 import { BadgeService } from '../../services/BadgeService/badge.service';
 import { PerformanceDisplayService } from '../../services/performance-display.service';
 import { LeaderBoardService } from '../../services/leaderBoard.service';
+import { ActivatedRoute } from '@angular/router';
+
 
 @Component({
     selector: 'app-activity-2',
@@ -38,25 +40,33 @@ export class MemoryGameComponent implements OnInit {
 
     private _faces = [
                 'area-1.png',
-                'blood-test.png',
-                'enlarged-liver-1.png',
-                'blood-test.png',
-                'enlarged-spleen-1.png',
-                'other-tests.png',
-                'enlarged-liver-1.png',
-                'rapid-diagnostic-test-1.png',
-                'other-tests.png',
-                'symptoms-1.png',
-                'symptoms-1.png',
-                'enlarged-spleen-1.png',
                 'area-1.png',
-                'virus-1.png',
+                'blood-test.png',
+                'blood-test.png',
+                'enlarged-liver-1.png',
+                'enlarged-liver-1.png',
+                'enlarged-spleen-1.png',
+                'enlarged-spleen-1.png',
+                'other-tests.png',
+                'other-tests.png',
                 'rapid-diagnostic-test-1.png',
+                'rapid-diagnostic-test-1.png',
+                'symptoms-1.png',
+                'symptoms-1.png',
+                'virus-1.png',
                 'virus-1.png',
             ];
+    public levelConfig = [{cardsCount: 8, rowCount: 4, columnCount: 2},
+                          {cardsCount: 12, rowCount: 4, columnCount: 3},
+                          {cardsCount: 16, rowCount: 4, columnCount: 4}
+                          ];
+    public currentLevel: any;
+    public  currStage = 7;
 
     constructor(private _langService: LanguageService, private _dashboardService: DashboardService, private _sharedData: SharedDataService,
-                private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService, private _leaderBoardService: LeaderBoardService) {
+                private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService, private _leaderBoardService: LeaderBoardService,
+                private _route: ActivatedRoute
+    ) {
             this._sharedData.position.subscribe(
             value => {
                 this.position = value;
@@ -73,6 +83,10 @@ export class MemoryGameComponent implements OnInit {
             this.language = response.pcprepkit.stages.medsNLabels.memoryGame;
             this.alerts = response.pcprepkit.common.alerts;
         });
+        this._route.params.subscribe( params => {
+        this.currentLevel = this.levelConfig[ params.level - 1];
+        });
+        this._faces.splice(this.currentLevel.cardsCount);
         this.shuffle(this._faces);
         this.createBoolArr();
     }
@@ -93,7 +107,7 @@ export class MemoryGameComponent implements OnInit {
      * Utility function to create a boolean array that prevents clicking on a card that was already matched
      */
     createBoolArr() {
-        for (let i = 1; i <= 16; i++) {
+        for (let i = 1; i <= this.currentLevel.cardsCount; i++) {
             this.isMatchArr.push(true);
         }
         return this.isMatchArr;
@@ -162,16 +176,15 @@ export class MemoryGameComponent implements OnInit {
                 }
             }
             this._matches++;
-            if (this._matches === 8) {
+            if (this._matches === this.currentLevel.cardsCount / 2) {
                 this._sharedData.customSuccessAlert(this.alerts.activitySuccessMsg, this.alerts.activitySuccessTitle);
                 this._status = {stage: 3, activity: 2};
                 this._dashboardService.updateProgressStatus(this._status).subscribe(response => {});
                 this.activityComplete = true;
                 if (!this.completed) {
                   const badgeNumber = 3;
-                  const currStage = 7;
                   this._badgeService.updateBadgeNumber(badgeNumber).subscribe(res => res);
-                  this._performanceService.openDialog(currStage); }
+                  this._performanceService.openDialog(this.currStage); }
                   this._leaderBoardService.updateLeaderBoard({activity: 'memoryGame', level: 'level1'});
             }
             return;

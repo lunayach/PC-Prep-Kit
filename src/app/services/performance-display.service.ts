@@ -17,7 +17,9 @@ export class PerformanceDisplayService {
     const currentActivityName = ActivityConfig[order - 1].name;
     const nextActivity = ActivityConfig[order].name;
     const nextActivityURL = ActivityConfig[order].url;
-    dialogConfig.data = {currentActivityName, nextActivity, nextActivityURL};
+    const levels = ActivityConfig[order - 1].levels;
+    const currActivityURL = ActivityConfig[order - 1].url;
+    dialogConfig.data = {currentActivityName, nextActivity, nextActivityURL, levels, currActivityURL};
     dialogConfig.width = '500px';
     this.dialog.open(PerformanceDisplayComponent, dialogConfig);
   }

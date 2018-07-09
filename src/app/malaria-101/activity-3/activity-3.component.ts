@@ -9,6 +9,8 @@ import { BadgeService } from '../../services/BadgeService/badge.service';
 import swal from 'sweetalert2';
 import { PerformanceDisplayService } from '../../services/performance-display.service';
 import { LeaderBoardService } from '../../services/leaderBoard.service';
+import { ActivatedRoute } from '@angular/router';
+
 
 @Component({
     selector: 'app-oddoneout',
@@ -35,9 +37,14 @@ export class OddOneOutComponent implements OnInit {
     public completed = false;
     public alerts: any;
     public solutions = '';
+    public levelConfig = [4, 6, 8]; // no of questions depending upon the level
+    public noOfQuestions: number;
+    public currStage = 5;
 
-    constructor(private _langService: LanguageService, private _dashboardService: DashboardService, private _sharedData: SharedDataService,  vcr: ViewContainerRef,
-                private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService, private _leaderBoardService: LeaderBoardService) {
+
+  constructor(private _langService: LanguageService, private _dashboardService: DashboardService, private _sharedData: SharedDataService,  vcr: ViewContainerRef,
+                private _performanceService: PerformanceDisplayService, private _badgeService: BadgeService, private _leaderBoardService: LeaderBoardService,
+                private _route: ActivatedRoute) {
 
     }
 
@@ -59,9 +66,13 @@ export class OddOneOutComponent implements OnInit {
         this._dashboardService.getProgressStatus().subscribe(response => {
             this.completed = this._sharedData.checkProgress(2, 3, response);
         });
+        this._route.params.subscribe( params => {
+          this.noOfQuestions = this.levelConfig[ params.level - 1];
+        });
         this._dashboardService.getJSONData('quiz.json').subscribe(response => {
             this._data = JSON.parse(response.data);
             this.shuffle(this._data.quizlist);
+            this._data.quizlist.splice(this.noOfQuestions);
             this.displayQuestion();
         });
     }
@@ -94,11 +105,10 @@ export class OddOneOutComponent implements OnInit {
         } else {
             this._sharedData.customErrorAlert(this.alerts.activityFailMsg, this.alerts.activityFailTitle);
         }
-        this._obs = observableInterval(1000).pipe(
+        this._obs = observableInterval(10).pipe(
                     tap(i => this.changeQuestion() ));
         this._subscription = this._obs.subscribe();
     }
-
     /**
      * Shuffle the questions and answers
      * @param {Array} array The array that has to be shuffled
@@ -125,7 +135,7 @@ export class OddOneOutComponent implements OnInit {
     changeQuestion() {
         this._subscription.unsubscribe();
         this._questionNumber++;
-        if (this._questionNumber === 5) {
+        if (this._questionNumber === this.noOfQuestions) {
             this.activityComplete = true;
             this._dashboardService.getActivityScore({activity: 'oddOneOut'}).subscribe( res => {
               const points = this.score * this.pointsPerCorrectAnswer;
@@ -143,9 +153,8 @@ export class OddOneOutComponent implements OnInit {
               type: 'info',
             }).then( res => { if (!this.completed) {
               const badgeNumber = 2;
-              const currStage = 5;
               this._badgeService.updateBadgeNumber(badgeNumber).subscribe(response => response);
-              this._performanceService.openDialog(currStage);
+              this._performanceService.openDialog(this.currStage);
           }});
             this._dashboardService.updateProgressStatus(this._status).subscribe(response => {});
             return;

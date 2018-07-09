@@ -5,6 +5,8 @@ import { DashboardService } from '../../services/dashboard.service';
 import { SharedDataService } from '../../services/shared.data.service';
 import { PerformanceDisplayService } from '../../services/performance-display.service';
 import { LeaderBoardService } from '../../services/leaderBoard.service';
+import { ActivatedRoute } from '@angular/router';
+
 
 @Component({
     selector: 'app-dragdrop',
@@ -27,6 +29,9 @@ export class DragdropComponent implements OnInit {
     public position= 'col-md-10 col-md-offset-2 introbody';
     public completed = false;
     public alerts: any;
+    public levelConfig = [5, 7, 10];
+    public noOfDosAndDonts;
+    public currStage = 4;
 
     /**
      * dosAndDonts description with the values,the same order will be displayed
@@ -59,8 +64,32 @@ export class DragdropComponent implements OnInit {
           this.language = response.pcprepkit.stages.malaria101.dragdrop;
           this.alerts = response.pcprepkit.common.alerts;
       });
+      this._route.params.subscribe( params => {
+        this.noOfDosAndDonts = this.levelConfig[ params.level - 1];
+      });
+      this.shuffle(this.dosAndDonts);
+      this.dosAndDonts.splice(this.noOfDosAndDonts);
     }
 
+  /**
+   * Shuffle the questions and answers
+   * @param {Array} array The array that has to be shuffled
+   */
+    shuffle(array) {
+      let currentIndex = array.length, temporaryValue, randomIndex;
+      // While there remain elements to shuffle...
+      while (0 !== currentIndex) {
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+      return array;
+    }
     /**
      * Checks if the Content is valid before dropping
      * Removes the Object from dosAndDonts Array and fill it in either do or dont array, Check if the dosAndDonts Array is empty
@@ -108,13 +137,13 @@ export class DragdropComponent implements OnInit {
         this._sharedData.customSuccessAlert(this.alerts.activitySuccessMsg, this.alerts.activitySuccessTitle);
         this._dashboardService.updateProgressStatus(this._status).subscribe(response => {});
         this._infokitService.activateinfokit('do_dont').subscribe(res => {});
-        if (!this.completed) { const currStage = 4;
-          this._performanceService.openDialog(currStage); }
+        if (!this.completed) {
+          this._performanceService.openDialog(this.currStage); }
 
     }
 
     constructor(private _dashboardService: DashboardService, private _sharedData: SharedDataService, private _infokitService: InfokitService,  vcr: ViewContainerRef, private _langService: LanguageService,
-                private _performanceService: PerformanceDisplayService, private _leaderBoardService: LeaderBoardService
+                private _performanceService: PerformanceDisplayService, private _leaderBoardService: LeaderBoardService, private _route: ActivatedRoute
     ) {
         this._dashboardService.getProgressStatus().subscribe(response => {
             this.completed = this._sharedData.checkProgress(2, 2, response);

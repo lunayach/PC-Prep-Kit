@@ -64,6 +64,7 @@ import { UserUpdateComponent } from './user-update/user-update.component';
 import { StridesAgainstModule } from './prevention/strides-against/strides-against.module';
 import { LeaderBoardService } from './services/leaderBoard.service';
 import { LeaderBoardComponent } from './leader-board/leader-board.component';
+import { LevelNavigateComponent } from './level-navigate/level-navigate.component';
 
 @NgModule({
   declarations: [
@@ -100,7 +101,8 @@ import { LeaderBoardComponent } from './leader-board/leader-board.component';
     PerformanceDisplayComponent,
     BadgeComponent,
     UserUpdateComponent,
-    LeaderBoardComponent
+    LeaderBoardComponent,
+    LevelNavigateComponent
   ],
   imports: [
     AppRoutingModule,
